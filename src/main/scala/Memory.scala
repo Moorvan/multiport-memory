@@ -2,8 +2,6 @@ package memory
 import chisel3._
 /**
  * @author YueChen
- * @date 2021/2/16 16:41
- * @version 1.0
  */
 // 可处理同时读写的存储器
 class Memory(c: Int, w: Int) extends Module {

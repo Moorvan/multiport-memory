@@ -4,9 +4,8 @@ import chisel3._
 
 /**
  * @author YueChen
- * @date 2021/2/16 17:07
- * @version 1.0
  */
+
 class XORMultiPortMemory(m: Int, n: Int) extends Module{
   val io = IO(new Bundle{
     val wrAddr = Input(Vec(m, UInt(10.W)))

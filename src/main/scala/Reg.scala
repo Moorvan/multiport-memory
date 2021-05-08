@@ -5,8 +5,6 @@ import java.io.{File, FileWriter}
 import chisel3._
 /**
  * @author YueChen
- * @date 2021/2/20 10:11
- * @version 1.0
  */
 class Reg extends Module{
   val io = IO(new Bundle() {

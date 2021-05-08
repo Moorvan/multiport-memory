@@ -4,8 +4,6 @@ import chisel3._
 
 /**
  * @author YueChen
- * @date 2021/4/23 16:24
- * @version 1.0
  */
 class OneHotCodeILvtMultiPortMemory(m: Int, n: Int) extends Module {
   val io = IO(new Bundle{
