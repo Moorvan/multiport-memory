@@ -1,8 +1,8 @@
-package reg
-
-import java.io.{File, FileWriter}
+package memory
 
 import chisel3._
+
+import java.io.{File, FileWriter}
 /**
  * @author YueChen
  */
