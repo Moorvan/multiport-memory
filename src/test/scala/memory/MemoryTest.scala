@@ -1,5 +1,6 @@
 package memory
 
+import Chisel.fromtIntToLiteral
 import chisel3.iotesters.PeekPokeTester
 
 /**

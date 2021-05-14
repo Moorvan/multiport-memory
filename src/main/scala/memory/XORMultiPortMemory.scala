@@ -6,28 +6,29 @@ import chisel3._
  * @author YueChen
  */
 
-class XORMultiPortMemory(m: Int, n: Int) extends Module{
+class XORMultiPortMemory(m: Int, n: Int, size: Int, w: Int) extends Module{
+  val addrW: Int = math.ceil(math.log(size) / math.log(2)).toInt
   val io = IO(new Bundle{
-    val wrAddr = Input(Vec(m, UInt(10.W)))
-    val wrData = Input(Vec(m, UInt(8.W)))
+    val wrAddr = Input(Vec(m, UInt(addrW.W)))
+    val wrData = Input(Vec(m, UInt(w.W)))
     val wrEna = Input(Vec(m, Bool()))
 
-    val rdAddr = Input(Vec(n, UInt(10.W)))
-    val rdData = Output(Vec(n, UInt(8.W)))
+    val rdAddr = Input(Vec(n, UInt(addrW.W)))
+    val rdData = Output(Vec(n, UInt(w.W)))
   })
   val memW = Array.fill(m * (m - 1)) {
-    Module(new Memory(1024, 8))
+    Module(new Memory(size, w))
   }
   val memR = Array.fill(m * n) {
-    Module(new Memory(1024, 8))
+    Module(new Memory(size, w))
   }
 
   // 异或结果存放
-  val wrIn = Wire(Vec(m, UInt(8.W)))
+  val wrIn = Wire(Vec(m, UInt(w.W)))
 
   // 计算异或结果
   for(i <- 0 until m) {
-    val xors = Wire(Vec(m, UInt(8.W)))
+    val xors = Wire(Vec(m, UInt(w.W)))
     xors(0) := io.wrData(i)
     var cnt = 1
     for(j <- 0 until m) {
@@ -65,7 +66,7 @@ class XORMultiPortMemory(m: Int, n: Int) extends Module{
 
   // 输出
   for(i <- 0 until n) {
-    val xors = Wire(Vec(m, UInt(8.W)))
+    val xors = Wire(Vec(m, UInt(w.W)))
     xors(0) := memR(i).io.rdData
     for(j <- 1 until m) {
       xors(j) := xors(j - 1) ^ memR(j * n + i).io.rdData

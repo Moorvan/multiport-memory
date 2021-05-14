@@ -11,18 +11,18 @@ import chisel3._
  * based on https://tomverbeure.github.io/2019/08/03/Multiport-Memories.html
  */
 
-class LiveValueTable(m: Int, n: Int) extends Module {
+class LiveValueTable(m: Int, n: Int, size: Int, w: Int) extends Module {
   val io = IO(new Bundle{
-    val wrAddr = Input(Vec(m, UInt(10.W)))
+    val wrAddr = Input(Vec(m, UInt(w.W)))
     val wrEna = Input(Vec(m, Bool()))
 
-    val rdAddr = Input(Vec(n, UInt(10.W)))
+    val rdAddr = Input(Vec(n, UInt(w.W)))
     val rdIdx = Output(Vec(n, UInt((math.log(m) / math.log(2) + 1).toInt.W)))
   })
 
   // initialization
-  val lvtInitArray = new Array[Int](128)
-  for(i <- 0 until 128) {
+  val lvtInitArray = new Array[Int](size)
+  for(i <- 0 until size) {
     lvtInitArray(i) = 0
   }
   val lvtReg = RegInit(VecInit(lvtInitArray.map(_.U((math.log(m) / math.log(2) + 1).toInt.W))))
@@ -39,17 +39,18 @@ class LiveValueTable(m: Int, n: Int) extends Module {
 }
 
 
-class LVTMultiPortRams(m: Int, n: Int) extends Module{
+class LVTMultiPortRams(m: Int, n: Int, size: Int, w: Int) extends Module{
+  val addrW: Int = math.ceil(math.log(size) / math.log(2)).toInt
   val io = IO(new Bundle{
-    val wrAddr = Input(Vec(m, UInt(10.W)))
-    val wrData = Input(Vec(m, UInt(8.W)))
+    val wrAddr = Input(Vec(m, UInt(addrW.W)))
+    val wrData = Input(Vec(m, UInt(w.W)))
     val wrEna = Input(Vec(m, Bool()))
 
-    val rdAddr = Input(Vec(n, UInt(10.W)))
-    val rdData = Output(Vec(n, UInt(8.W)))
+    val rdAddr = Input(Vec(n, UInt(addrW.W)))
+    val rdData = Output(Vec(n, UInt(w.W)))
   })
-  val mems = VecInit(Seq.fill(m * n)(Module(new Memory(1024, 8)).io))
-  val lvt = Module(new LiveValueTable(m, n))
+  val mems = VecInit(Seq.fill(m * n)(Module(new Memory(size, w)).io))
+  val lvt = Module(new LiveValueTable(m, n, size, w))
 
   for(i <- 0 until m) {
     for(j <- 0 until n) {

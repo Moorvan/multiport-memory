@@ -1,11 +1,6 @@
 package memory
 import chisel3._
 import chisel3.iotesters._
-
-
-
-
-
 class XORMultiPortMemoryTest(dut: XORMultiPortMemory) extends PeekPokeTester(dut) {
   poke(dut.io.wrAddr(0), 0.U)
   poke(dut.io.wrData(0), 19.U)
