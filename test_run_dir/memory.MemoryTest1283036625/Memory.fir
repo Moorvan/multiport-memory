@@ -5,18 +5,11 @@ circuit Memory :
     input reset : UInt<1>
     output io : {flip rdAddr : UInt<4>, rdData : UInt<8>, flip wrEna : UInt<1>, flip wrData : UInt<8>, flip wrAddr : UInt<4>}
     
-    smem mem : UInt<8>[16], undefined @[Memory.scala 18:24]
-    reg wrDateReg : UInt, clock @[Memory.scala 20:26]
-    wrDateReg <= io.wrData @[Memory.scala 20:26]
-    node _doForwardReg_T = eq(io.wrAddr, io.rdAddr) @[Memory.scala 21:40]
-    node _doForwardReg_T_1 = and(_doForwardReg_T, io.wrEna) @[Memory.scala 21:54]
-    reg doForwardReg : UInt<1>, clock @[Memory.scala 21:29]
-    doForwardReg <= _doForwardReg_T_1 @[Memory.scala 21:29]
-    read mport memData = mem[io.rdAddr], clock @[Memory.scala 22:25]
-    when io.wrEna : @[Memory.scala 24:18]
+    smem mem : UInt<8>[16], undefined @[Memory.scala 16:24]
+    when io.wrEna : @[Memory.scala 22:18]
       write mport MPORT = mem[io.wrAddr], clock
       MPORT <= io.wrData
-      skip @[Memory.scala 24:18]
-    node _io_rdData_T = mux(doForwardReg, wrDateReg, memData) @[Memory.scala 27:19]
-    io.rdData <= _io_rdData_T @[Memory.scala 27:13]
+      skip @[Memory.scala 22:18]
+    read mport io_rdData_MPORT = mem[io.rdAddr], clock @[Memory.scala 26:24]
+    io.rdData <= io_rdData_MPORT @[Memory.scala 26:13]
     

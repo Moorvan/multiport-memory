@@ -15,12 +15,13 @@ class Memory(c: Int, w: Int) extends Module {
   })
   val mem = SyncReadMem(c, UInt(w.W))
 
-  val wrDateReg = RegNext(io.wrData)
-  val doForwardReg = RegNext(io.wrAddr === io.rdAddr && io.wrEna)
-  val memData = mem.read(io.rdAddr)
+//  val wrDateReg = RegNext(io.wrData)
+//  val doForwardReg = RegNext(io.wrAddr === io.rdAddr && io.wrEna)
+//  val memData = mem.read(io.rdAddr)
 
   when(io.wrEna) {
     mem.write(io.wrAddr, io.wrData)
   }
-  io.rdData := Mux(doForwardReg, wrDateReg, memData)
+//  io.rdData := Mux(doForwardReg, wrDateReg, memData)
+  io.rdData := mem.read(io.rdAddr)
 }

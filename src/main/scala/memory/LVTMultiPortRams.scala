@@ -11,12 +11,12 @@ import chisel3._
  * based on https://tomverbeure.github.io/2019/08/03/Multiport-Memories.html
  */
 
-class LiveValueTable(m: Int, n: Int, size: Int, w: Int) extends Module {
+class LiveValueTable(m: Int, n: Int, size: Int, addrW: Int) extends Module {
   val io = IO(new Bundle{
-    val wrAddr = Input(Vec(m, UInt(w.W)))
+    val wrAddr = Input(Vec(m, UInt(addrW.W)))
     val wrEna = Input(Vec(m, Bool()))
 
-    val rdAddr = Input(Vec(n, UInt(w.W)))
+    val rdAddr = Input(Vec(n, UInt(addrW.W)))
     val rdIdx = Output(Vec(n, UInt((math.log(m) / math.log(2) + 1).toInt.W)))
   })
 
@@ -50,7 +50,7 @@ class LVTMultiPortRams(m: Int, n: Int, size: Int, w: Int) extends Module{
     val rdData = Output(Vec(n, UInt(w.W)))
   })
   val mems = VecInit(Seq.fill(m * n)(Module(new Memory(size, w)).io))
-  val lvt = Module(new LiveValueTable(m, n, size, w))
+  val lvt = Module(new LiveValueTable(m, n, size, addrW))
 
   for(i <- 0 until m) {
     for(j <- 0 until n) {

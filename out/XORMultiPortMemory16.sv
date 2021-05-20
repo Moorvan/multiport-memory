@@ -1,43 +1,37 @@
 module Memory(
   input        clock,
-  input  [9:0] io_rdAddr,
+  input  [3:0] io_rdAddr,
   output [7:0] io_rdData,
   input        io_wrEna,
   input  [7:0] io_wrData,
-  input  [9:0] io_wrAddr
+  input  [3:0] io_wrAddr
 );
 `ifdef RANDOMIZE_MEM_INIT
   reg [31:0] _RAND_0;
 `endif // RANDOMIZE_MEM_INIT
 `ifdef RANDOMIZE_REG_INIT
   reg [31:0] _RAND_1;
-  reg [31:0] _RAND_2;
-  reg [31:0] _RAND_3;
 `endif // RANDOMIZE_REG_INIT
-  reg [7:0] mem [0:1023]; // @[Memory.scala 18:24]
-  wire [7:0] mem_memData_data; // @[Memory.scala 18:24]
-  wire [9:0] mem_memData_addr; // @[Memory.scala 18:24]
-  wire [7:0] mem_MPORT_data; // @[Memory.scala 18:24]
-  wire [9:0] mem_MPORT_addr; // @[Memory.scala 18:24]
-  wire  mem_MPORT_mask; // @[Memory.scala 18:24]
-  wire  mem_MPORT_en; // @[Memory.scala 18:24]
-  reg [9:0] mem_memData_addr_pipe_0;
-  reg [7:0] wrDateReg; // @[Memory.scala 20:26]
-  reg  doForwardReg; // @[Memory.scala 21:29]
-  assign mem_memData_addr = mem_memData_addr_pipe_0;
-  assign mem_memData_data = mem[mem_memData_addr]; // @[Memory.scala 18:24]
+  reg [7:0] mem [0:15]; // @[Memory.scala 16:24]
+  wire [7:0] mem_io_rdData_MPORT_data; // @[Memory.scala 16:24]
+  wire [3:0] mem_io_rdData_MPORT_addr; // @[Memory.scala 16:24]
+  wire [7:0] mem_MPORT_data; // @[Memory.scala 16:24]
+  wire [3:0] mem_MPORT_addr; // @[Memory.scala 16:24]
+  wire  mem_MPORT_mask; // @[Memory.scala 16:24]
+  wire  mem_MPORT_en; // @[Memory.scala 16:24]
+  reg [3:0] mem_io_rdData_MPORT_addr_pipe_0;
+  assign mem_io_rdData_MPORT_addr = mem_io_rdData_MPORT_addr_pipe_0;
+  assign mem_io_rdData_MPORT_data = mem[mem_io_rdData_MPORT_addr]; // @[Memory.scala 16:24]
   assign mem_MPORT_data = io_wrData;
   assign mem_MPORT_addr = io_wrAddr;
   assign mem_MPORT_mask = 1'h1;
   assign mem_MPORT_en = io_wrEna;
-  assign io_rdData = doForwardReg ? wrDateReg : mem_memData_data; // @[Memory.scala 27:19]
+  assign io_rdData = mem_io_rdData_MPORT_data; // @[Memory.scala 26:13]
   always @(posedge clock) begin
     if(mem_MPORT_en & mem_MPORT_mask) begin
-      mem[mem_MPORT_addr] <= mem_MPORT_data; // @[Memory.scala 18:24]
+      mem[mem_MPORT_addr] <= mem_MPORT_data; // @[Memory.scala 16:24]
     end
-    mem_memData_addr_pipe_0 <= io_rdAddr;
-    wrDateReg <= io_wrData; // @[Memory.scala 20:26]
-    doForwardReg <= io_wrAddr == io_rdAddr & io_wrEna; // @[Memory.scala 21:54]
+    mem_io_rdData_MPORT_addr_pipe_0 <= io_rdAddr;
   end
 // Register and memory initialization
 `ifdef RANDOMIZE_GARBAGE_ASSIGN
@@ -76,16 +70,12 @@ initial begin
     `endif
 `ifdef RANDOMIZE_MEM_INIT
   _RAND_0 = {1{`RANDOM}};
-  for (initvar = 0; initvar < 1024; initvar = initvar+1)
+  for (initvar = 0; initvar < 16; initvar = initvar+1)
     mem[initvar] = _RAND_0[7:0];
 `endif // RANDOMIZE_MEM_INIT
 `ifdef RANDOMIZE_REG_INIT
   _RAND_1 = {1{`RANDOM}};
-  mem_memData_addr_pipe_0 = _RAND_1[9:0];
-  _RAND_2 = {1{`RANDOM}};
-  wrDateReg = _RAND_2[7:0];
-  _RAND_3 = {1{`RANDOM}};
-  doForwardReg = _RAND_3[0:0];
+  mem_io_rdData_MPORT_addr_pipe_0 = _RAND_1[3:0];
 `endif // RANDOMIZE_REG_INIT
   `endif // RANDOMIZE
 end // initial
@@ -97,53 +87,53 @@ endmodule
 module XORMultiPortMemory(
   input        clock,
   input        reset,
-  input  [9:0] io_wrAddr_0,
-  input  [9:0] io_wrAddr_1,
+  input  [3:0] io_wrAddr_0,
+  input  [3:0] io_wrAddr_1,
   input  [7:0] io_wrData_0,
   input  [7:0] io_wrData_1,
   input        io_wrEna_0,
   input        io_wrEna_1,
-  input  [9:0] io_rdAddr_0,
-  input  [9:0] io_rdAddr_1,
+  input  [3:0] io_rdAddr_0,
+  input  [3:0] io_rdAddr_1,
   output [7:0] io_rdData_0,
   output [7:0] io_rdData_1
 );
   wire  Memory_clock; // @[XORMultiPortMemory.scala 20:11]
-  wire [9:0] Memory_io_rdAddr; // @[XORMultiPortMemory.scala 20:11]
+  wire [3:0] Memory_io_rdAddr; // @[XORMultiPortMemory.scala 20:11]
   wire [7:0] Memory_io_rdData; // @[XORMultiPortMemory.scala 20:11]
   wire  Memory_io_wrEna; // @[XORMultiPortMemory.scala 20:11]
   wire [7:0] Memory_io_wrData; // @[XORMultiPortMemory.scala 20:11]
-  wire [9:0] Memory_io_wrAddr; // @[XORMultiPortMemory.scala 20:11]
+  wire [3:0] Memory_io_wrAddr; // @[XORMultiPortMemory.scala 20:11]
   wire  Memory_1_clock; // @[XORMultiPortMemory.scala 20:11]
-  wire [9:0] Memory_1_io_rdAddr; // @[XORMultiPortMemory.scala 20:11]
+  wire [3:0] Memory_1_io_rdAddr; // @[XORMultiPortMemory.scala 20:11]
   wire [7:0] Memory_1_io_rdData; // @[XORMultiPortMemory.scala 20:11]
   wire  Memory_1_io_wrEna; // @[XORMultiPortMemory.scala 20:11]
   wire [7:0] Memory_1_io_wrData; // @[XORMultiPortMemory.scala 20:11]
-  wire [9:0] Memory_1_io_wrAddr; // @[XORMultiPortMemory.scala 20:11]
+  wire [3:0] Memory_1_io_wrAddr; // @[XORMultiPortMemory.scala 20:11]
   wire  Memory_2_clock; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_2_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_2_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_2_io_rdData; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_2_io_wrEna; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_2_io_wrData; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_2_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_2_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_3_clock; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_3_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_3_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_3_io_rdData; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_3_io_wrEna; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_3_io_wrData; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_3_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_3_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_4_clock; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_4_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_4_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_4_io_rdData; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_4_io_wrEna; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_4_io_wrData; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_4_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_4_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_5_clock; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_5_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_5_io_rdAddr; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_5_io_rdData; // @[XORMultiPortMemory.scala 23:11]
   wire  Memory_5_io_wrEna; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] Memory_5_io_wrData; // @[XORMultiPortMemory.scala 23:11]
-  wire [9:0] Memory_5_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
+  wire [3:0] Memory_5_io_wrAddr; // @[XORMultiPortMemory.scala 23:11]
   wire [7:0] xors_2_0 = Memory_2_io_rdData; // @[XORMultiPortMemory.scala 69:20 XORMultiPortMemory.scala 70:13]
   wire [7:0] xors_3_0 = Memory_3_io_rdData; // @[XORMultiPortMemory.scala 69:20 XORMultiPortMemory.scala 70:13]
   Memory Memory ( // @[XORMultiPortMemory.scala 20:11]
